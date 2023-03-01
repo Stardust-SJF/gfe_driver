@@ -157,6 +157,9 @@ bool StingerDV::add_edge(graph::WeightedEdge e){
     return rc >= 0;
 }
 
+bool StingerDV::update_edge(gfe::graph::WeightedEdge e){
+    return true;
+}
 
 bool StingerDV::add_edge_v2(gfe::graph::WeightedEdge e){
     add_vertex(e.source());

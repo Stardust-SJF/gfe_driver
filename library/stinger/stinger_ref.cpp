@@ -215,7 +215,7 @@ pvector<int64_t> do_bfs(stinger_t* g, int64_t NV, uint64_t num_out_edges, int64_
     int64_t distance = 1; // current distance
     while (!timer.is_timeout() && !queue.empty()) {
 
-        if (scout_count > edges_to_check / alpha) {
+        if (/*scout_count > edges_to_check / alpha*/0) {
             int64_t awake_count, old_awake_count;
             QueueToBitmap(queue, front);
             awake_count = queue.size();

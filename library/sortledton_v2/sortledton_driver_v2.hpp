@@ -145,6 +145,8 @@ using namespace std;
         */
         virtual bool add_edge_v2(gfe::graph::WeightedEdge e);
 
+        virtual bool  update_edge(gfe::graph::WeightedEdge e);
+
         /**
          * Remove the given edge from the graph. There is no way to check whether the operation actually succeeded
          * in this implementation of GraphOne. Attempting to remove an edge that does not exist may result in a crash.

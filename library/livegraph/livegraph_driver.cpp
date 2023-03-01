@@ -185,6 +185,10 @@ bool LiveGraphDriver::has_vertex(uint64_t vertex_id) const {
     return VertexDictionary->find(accessor, vertex_id);
 }
 
+bool LiveGraphDriver::update_edge(gfe::graph::WeightedEdge e) {
+    return true;
+}
+
 bool LiveGraphDriver::add_edge(gfe::graph::WeightedEdge e){
     //COUT_DEBUG("Edge: " << e);
 
@@ -634,7 +638,7 @@ unique_ptr<int64_t[]> do_bfs(lg::Transaction& transaction, uint64_t num_vertices
 
     while (!timer.is_timeout() && !queue.empty()) {
 
-        if (scout_count > edges_to_check / alpha) {
+        if (/*scout_count > edges_to_check / alpha*/0) {
             int64_t awake_count, old_awake_count;
             do_bfs_QueueToBitmap(transaction, max_vertex_id, queue, front);
             awake_count = queue.size();

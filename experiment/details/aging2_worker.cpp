@@ -21,6 +21,7 @@
 #include <cassert>
 #include <chrono>
 #include <iostream>
+#include <fstream>
 #include <mutex>
 #include <random>
 #include <thread>
@@ -38,6 +39,12 @@
 
 using namespace common;
 using namespace std;
+
+typedef struct _up_out {
+    int64_t source;
+    int64_t destination;
+    double weight;
+} Up_out;
 
 /*****************************************************************************
  *                                                                           *
@@ -242,6 +249,8 @@ void Aging2Worker::main_execute_updates(){
 
             uint64_t num_ops_done = m_master.m_num_operations_performed.fetch_add( end - start );
 
+//            LOG("[thread: " << ::common::concurrency::get_thread_id() << ", worker_id: " << m_worker_id << "]" << start << " " << end << " " << num_ops_done);
+
             // report progress
             if(report_progress && static_cast<int>(100.0 * num_ops_done/num_total_ops) > m_master.m_last_progress_reported){
                 m_master.m_last_progress_reported = 100.0 * num_ops_done/num_total_ops;
@@ -285,6 +294,8 @@ void Aging2Worker::main_load_edges(uint64_t* edges, uint64_t num_edges){
 
     constexpr uint64_t last_max_sz = (1ull << 22); // 4M
     const uint64_t modulo = m_master.parameters().m_num_threads;
+
+//    std::cout << edges[0] << " , " << edges[num_edges - 1] << " " << num_edges << std::endl;
 
     uint64_t* __restrict sources = edges;
     uint64_t* __restrict destinations = sources + num_edges;
@@ -357,7 +368,11 @@ void Aging2Worker::graph_execute_batch_updates0(graph::WeightedEdge* __restrict 
         if(m_master.m_stop_experiment) break; // timeout, we're done
 
         if(updates[i].m_weight >= 0){ // insertion
+#if defined(HAVE_BVGT)
+            graph_update_edge<with_latency>(updates[i]);
+#else
             graph_insert_edge<with_latency>(updates[i]);
+#endif
         } else { // deletion
             graph_remove_edge<with_latency>(updates[i].edge());
         }
@@ -388,6 +403,31 @@ void Aging2Worker::graph_insert_edge(graph::WeightedEdge edge){
     }
     m_is_in_library_code = false;
 }
+
+template<bool with_latency>
+void Aging2Worker::graph_update_edge(graph::WeightedEdge edge){
+    if(!m_master.is_directed() && m_uniform(m_random) < 0.5) edge.swap_src_dst(); // noise
+    COUT_DEBUG("edge: " << edge);
+//    std::cout << "updating edge..." << std::endl;
+    m_is_in_library_code = true;
+    if(with_latency == false){
+        // the function returns true if the edge has been inserted. Repeat the loop if it cannot insert the edge as one of
+        // the vertices is still being inserted by another thread
+        while ( ! m_library->update_edge(edge) ) { /* nop */ };
+
+    } else { // measure the latency of the insertion
+        chrono::steady_clock::time_point t0, t1;
+        do {
+            t0 = chrono::steady_clock::now();
+        } while ( ! m_library->update_edge(edge) );
+        t1 = chrono::steady_clock::now();
+
+        m_latency_insertions[0] = chrono::duration_cast<chrono::nanoseconds>(t1 - t0).count();
+        m_latency_insertions++;
+    }
+    m_is_in_library_code = false;
+}
+
 
 template<bool with_latency>
 void Aging2Worker::graph_remove_edge(graph::Edge edge, bool force){

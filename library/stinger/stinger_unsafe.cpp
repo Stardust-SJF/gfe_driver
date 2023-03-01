@@ -409,6 +409,10 @@ bool Stinger::add_edge(graph::WeightedEdge e){
     return rc >= 0;
 }
 
+bool Stinger::update_edge(gfe::graph::WeightedEdge e) {
+    return true;
+}
+
 bool Stinger::add_edge_v2(gfe::graph::WeightedEdge e){
     COUT_DEBUG("edge: " << e);
 

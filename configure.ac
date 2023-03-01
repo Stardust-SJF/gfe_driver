@@ -553,7 +553,10 @@ if ( test x"${with_livegraph}" != x"" && test x"${with_livegraph}" != "no" ); th
         [ AC_MSG_ERROR(["the path does not exist: ${path_livegraph_library}"]) ]
     )
     
-    AC_SEARCH_LIBS([_ZN2lg5Graph17begin_transactionEv], [livegraph], [], [ AC_MSG_ERROR([cannot link the library livegraph]) ])
+#    AC_SEARCH_LIBS([_ZN2lg5Graph17begin_transactionEv], [livegraph], [], [ AC_MSG_ERROR([cannot link the library livegraph]) ])
+
+    path_livegraph_library="${path_bvgt}/liblivegraph.so"
+    AS_VAR_SET([LIBS], ["-L${path_livegraph_library} -llivegraph ${LIBS}"])
     
     AC_MSG_NOTICE([LiveGraph support enabled])
     AS_VAR_APPEND([CPPFLAGS], [" -DHAVE_LIVEGRAPH"])
@@ -601,6 +604,7 @@ if ( test x"${with_sortledton}" != x"" && test x"${with_sortledton}" != "no" ); 
     ], [], [
         AC_MSG_FAILURE([unable to compile and link an executable with Sortledton])
     ])
+
 
     AC_MSG_NOTICE([Sortledton support enabled])
     AS_VAR_APPEND([CPPFLAGS], [" -DHAVE_SORTLEDTON"])
@@ -653,6 +657,39 @@ if ( test x"${with_sortledtonv2}" != x"" && test x"${with_sortledtonv2}" != "no"
 
     AC_MSG_NOTICE([Sortledton V2 support enabled])
     AS_VAR_APPEND([CPPFLAGS], [" -DHAVE_SORTLEDTONV2"])
+fi
+
+#############################################################################
+# Support for the BVGT
+# Usage:
+# --with-bvgt=/path/to/bvgt/build
+#
+
+AC_ARG_WITH([bvgt], [AS_HELP_STRING([--with-bvgt@<:@=ARG@:>@], [
+    Enable the support to bvgt. The argument needs to be the path where the library has been built.
+])], [])
+
+if ( test x"${with_bvgt}" != x"" && test x"${with_bvgt}" != "no" ); then
+    if( test x"${with_bvgt}" == x"yes" ); then
+        AC_MSG_ERROR(["the full path to the BVGT build needs to be specified, e.g. --with-bvgt=/path/to/bvgt/build"]);
+    fi
+
+    if ( test "${have_openmp}" == "no" ); then
+            AC_MSG_FAILURE([BVGT: missing prerequisite header omp.h (OpenMP runtime library)])
+        fi
+
+    MY_INTEL_TBB()
+
+    path_bvgt=$(realpath "${with_bvgt}")
+    path_bvgt_library="${path_bvgt}/libBVGT.a"
+    AC_CHECK_FILE([${path_bvgt_library}], [  ],  [ AC_MSG_ERROR([file not found: ${path_bvgt_library}]) ])
+
+
+    # TODOfinished clean up include structure in bvgt
+    AS_VAR_SET([LIBS], ["-L${path_bvgt} -lBVGT ${LIBS}"])
+
+    AC_MSG_NOTICE([BVGT support enabled])
+    AS_VAR_APPEND([CPPFLAGS], [" -DHAVE_BVGT"])
 fi
 
 #############################################################################

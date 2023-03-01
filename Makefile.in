@@ -104,6 +104,9 @@ endif
 ifneq (,$(findstring -DHAVE_SORTLEDTON,${ALL_CPPFLAGS}))
 	sources += $(addprefix library/sortledton/, sortledton_driver.cpp)
 endif
+ifneq (,$(findstring -DHAVE_BVGT,${ALL_CPPFLAGS}))
+	sources += $(addprefix library/bvgt/, bvgt_driver.cpp)
+endif
 
 ifneq (,$(findstring -DHAVE_SORTLEDTONV2,${ALL_CPPFLAGS}))
 	sources += $(addprefix library/sortledton_v2/, sortledton_driver_v2.cpp)

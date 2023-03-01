@@ -236,7 +236,7 @@ pvector<int64_t> do_bfs(ll_mlcsr_ro_graph& graph, bool is_directed, uint64_t num
     int64_t distance = 1; // current distance
     while (!timer.is_timeout() && !queue.empty()) {
 
-        if (scout_count > edges_to_check / alpha) {
+        if (/*scout_count > edges_to_check / alpha*/0) {
             int64_t awake_count, old_awake_count;
             QueueToBitmap(queue, front);
             awake_count = queue.size();

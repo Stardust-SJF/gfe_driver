@@ -266,7 +266,8 @@ pvector<int64_t> teseo_bfs(OpenMP& openmp, int64_t source, utility::TimeoutServi
     int64_t distance = 1; // current distance
     while (!timer.is_timeout() && !queue.empty()) {
 
-        if (scout_count > edges_to_check / alpha) {
+        if (0/*scout_count > edges_to_check / alpha*/) {
+//            cout << "DTSearch" << endl;
             int64_t awake_count, old_awake_count;
             QueueToBitmap(queue, front);
             awake_count = queue.size();

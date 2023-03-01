@@ -173,6 +173,10 @@ bool TeseoDriver::add_edge(gfe::graph::WeightedEdge e) {
     }
 }
 
+bool TeseoDriver::update_edge(gfe::graph::WeightedEdge e) {
+    return true;
+}
+
 bool TeseoDriver::add_edge_v2(gfe::graph::WeightedEdge e){
     static cuckoohash_map<uint64_t, bool> vertices;
 
@@ -388,8 +392,8 @@ pvector<int64_t> teseo_bfs(OpenMP& openmp, int64_t source, utility::TimeoutServi
     int64_t scout_count = openmp.transaction().degree(source, true);
     int64_t distance = 1; // current distance
     while (!timer.is_timeout() && !queue.empty()) {
-
-        if (scout_count > edges_to_check / alpha) {
+        // note edit to 0 for comparison with BVGraphTree
+        if ( 0/*scout_count > edges_to_check / alpha*/) {
             int64_t awake_count, old_awake_count;
             QueueToBitmap(queue, front);
             awake_count = queue.size();
@@ -848,12 +852,15 @@ void TeseoDriver::lcc(const char* dump2file) {
 
     // Run the LCC algorithm
     unique_ptr<double[]> scores = teseo_lcc(openmp, timeout);
-    if(timeout.is_timeout()){ RAISE_EXCEPTION(TimeoutError, "Timeout occurred after " << timer);  }
+    for (int i = 0; i < 10; i++) {
+        std::cout << scores[i] << std::endl;
+    }
+//    if(timeout.is_timeout()){ RAISE_EXCEPTION(TimeoutError, "Timeout occurred after " << timer);  }
 
     // translate the vertex IDs
     const uint64_t N = openmp.transaction().num_vertices();
     auto external_ids = translate<double>(openmp, scores.get(), N);
-    if(timeout.is_timeout()){ RAISE_EXCEPTION(TimeoutError, "Timeout occurred after " << timer); }
+//    if(timeout.is_timeout()){ RAISE_EXCEPTION(TimeoutError, "Timeout occurred after " << timer); }
 
     // store the results in the given file
     if(dump2file != nullptr)
@@ -979,7 +986,7 @@ static gapbs::pvector<WeightT> teseo_sssp(OpenMP& openmp, uint64_t source, doubl
 
             #pragma omp barrier
         }
-
+//        std::cout << "took " << iter << " iterations" << std::endl;
 #if defined(DEBUG)
         #pragma omp single
         COUT_DEBUG("took " << iter << " iterations");

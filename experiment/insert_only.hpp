@@ -45,6 +45,7 @@ class InsertOnly {
 
     // Execute the experiment with the round robin scheduler
     void execute_round_robin();
+    void execute_round_robin_delete();
 
 public:
     // Initialise the experiment

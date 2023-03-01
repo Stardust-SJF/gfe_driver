@@ -265,6 +265,10 @@ bool LLAMA_DV::add_edge(graph::WeightedEdge e){
     return add_edge0(e.source(), e.destination(), e.weight());
 }
 
+    bool LLAMA_DV::update_edge(gfe::graph::WeightedEdge e) {
+    return true;
+}
+
 bool LLAMA_DV::add_edge_v2(gfe::graph::WeightedEdge e){
     shared_lock<shared_mutex_t> cplock(m_lock_checkpoint); // forbid any checkpoint now
     COUT_DEBUG("edge: " << e);

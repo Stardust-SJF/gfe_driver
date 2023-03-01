@@ -116,6 +116,8 @@ public:
      */
     virtual bool add_edge(gfe::graph::WeightedEdge e);
 
+    virtual bool update_edge(gfe::graph::WeightedEdge e);
+
     /**
      * Add the given edge in the graph. Implicitly create the referred vertices if they do not already exist.
      * If the edge already exists, its weight is updated.

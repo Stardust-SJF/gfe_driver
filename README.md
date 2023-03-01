@@ -2,17 +2,11 @@
 GFE Driver
 ---
 
-The GFE (Graph Framework Evaluation) Driver is the program used to run the experiments in "Sortledton: a universal
-graph data structure", measuring the throughput of updates in libraries supporting structural dynamic graphs and the completion times of 
-the [Graphalytics kernels](https://github.com/ldbc/ldbc_graphalytics). 
-The driver supports the following systems: [Sortledton](https://gitlab.db.in.tum.de/per.fuchs/sortledton), [Teseo](https://github.com/cwida/teseo), 
-[LLAMA](https://github.com/goatdb/llama), [GraphOne](https://github.com/the-data-lab/GraphOne), 
+The GFE (Graph Framework Evaluation) Driver is the program used to run the experiments in "Spruce: a Fast, Space-saving Structure for Dynamic Graph Storage", measuring the throughput of updates in libraries supporting structural dynamic graphs and the completion times of the [Graphalytics kernels](https://github.com/ldbc/ldbc_graphalytics). 
+The driver supports the following structures: Spruce, [Sortledton](https://gitlab.db.in.tum.de/per.fuchs/sortledton), [Teseo](https://github.com/cwida/teseo), [GraphOne](https://github.com/the-data-lab/GraphOne), 
 [Stinger](http://stingergraph.com/) and [LiveGraph](https://github.com/thu-pacman/LiveGraph-Binary). 
-Additionally, it supports running the microbenchmarks from the Sortledton paper: [Microbenchmarks](https://gitlab.db.in.tum.de/per.fuchs/graph-data-structure-microbenchmarks).
-It can run three kinds experiments: insert all edges in a random permuted order from an input graph, 
-execute the updates specified by a [graphlog file](https://github.com/whatsthecraic/graphlog) and run the kernels of
-the Graphalytics suite: BFS, PageRank (PR), local triangle counting (LCC), weighted shortest paths (SSSP), 
-weakly connected components (WCC) and community detection through label propagation (CDLP).  
+It can run several kinds experiments: insert/delete all edges in a random permuted order from an input graph, 
+execute the updates specified by a [graphlog file](https://github.com/whatsthecraic/graphlog) and run the kernels of the Graphalytics suite: BFS, PageRank (PR), local triangle counting (LCC), weighted shortest paths (SSSP), weakly connected components (WCC) and community detection through label propagation (CDLP).  
 
 ### Build 
 
@@ -63,25 +57,6 @@ Configure the GFE driver with:
 ```
 mkdir build && cd build
 ../configure --enable-optimize --disable-debug --with-stinger=/path/to/stinger/build
-```
-
-##### LLAMA
-
-Use the branch `feature/gfe `, it contains additional patches w.r.t. 
-[upstream](https://github.com/goatdb/llama), from https://github.com/whatsthecraic/llama.
-For the paper, we evaluated commit `32053f4ff800bed1989da79e189feeaa1bbb84b3`.
-
-```
-git clone https://github.com/whatsthecraic/llama -b feature/gfe
-```
-
-LLAMA is a header-only library. It does not need to be compiled in advance.
-
-Configure the GFE driver with:
-
-```
-mkdir build && cd build
-../configure --enable-optimize --disable-debug --with-llama=/path/to/llama
 ```
 
 
@@ -148,21 +123,19 @@ Then configure the driver with:
 
 ```
 mkdir build && cd build
-../configure --enable-optimize --disable-debug --with-sortledton=/path/to/microbenchmark/build   
+../configure --enable-optimize --disable-debug --with-sortledton=/path/to/microbenchmark/build  
 ```
 
-#### Microbenchmarks
+##### Spruce
 
-Use the branch `master` from `https://gitlab.db.in.tum.de/per.fuchs/graph-data-structure-microbenchmarks`.
-For the paper, we evaluated commit "a32b8ac208bb889b518e14b1317957c9a8c466b6".
+Use the library in our GitHub Release Page:
 
-Follow the instructions in the README of the repository to setup and build the library.
 Then configure the driver with:
 
-```
+````````shell
 mkdir build && cd build
-../configure --enable-optimize --disable-debug --with-microbenchmarks=/path/to/microbenchmark/build   
-```
+../configure --enable-optimize --disable-debug --with-bvgt=/path/to/spruce/build/
+````````
 
 #### Compile
 
@@ -174,15 +147,13 @@ If in the mood of running the testsuite, type `make check -j`.
 
 In our experiments, we used the following input graphs and data sets:
 
-- `dota-league` and `graph500-SF`, with `SF` in {22, 24 26} and `com-friendster`, were taken from the [official Graphalytics collection](https://www.graphalytics.org/datasets).
-- `uniform-SF`, with `SF` in {22, 24, 26} were generated with an [ad-hoc tool](https://github.com/whatsthecraic/uniform_graph_generator). These are synthetic graphs having the same number of vertices and edges of `graph500-SF`, but a uniform node degree distribution.
+- `dota-league` and `graph500-SF`, with `SF` in {24 26} , were taken from the [official Graphalytics collection](https://www.graphalytics.org/datasets).
+- `uniform-SF`, with `SF` in {24, 26} were generated with an [ad-hoc tool](https://github.com/whatsthecraic/uniform_graph_generator). These are synthetic graphs having the same number of vertices and edges of `graph500-SF`, but a uniform node degree distribution.
 - The logs for the experiments with updates, i.e. with both insertions and deletions,
   were generated with another [ad-hoc tool](https://github.com/whatsthecraic/graphlog). 
-- `yahoo-songs` and `edit-enwiki` were taken from the [Konect webpage](http://konect.cc/networks/) they were prepared 
+- `yahoo-songs` was taken from the [Konect webpage](http://konect.cc/networks/) they were prepared 
   for our experiments by sorting them by timestamp and removing duplicates by using `tools/timestampd_graph_2_edge_list.py`.  
-
-A complete image of all datasets used in the experiments can be downloaded from Zenodo: [input graphs](https://zenodo.org/record/3966439),
-[graph logs](https://zenodo.org/record/3967002), [dense friendster](https://zenodo.org/record/5146230) and [timestamped graphs](https://zenodo.org/record/5752476).
+- `livejournal`,`orkut` and `com-friendster` were taken from the [Stanford Large Network Dataset Collection](https://snap.stanford.edu/data/index.html).
 
 ### Executing the driver
 
@@ -190,19 +161,37 @@ A complete image of all datasets used in the experiments can be downloaded from 
 The driver takes as input a list of options together with a graph, and emits the results into a sqlite3 database.
 There are three kinds of experiments that can be executed:
 
-- **Insertions only**: insert all vertices and edges from an input graph, in a random order. Use the command:
+- **Insertions only** : insert all vertices and edges from an input graph, in a random order. Use the command:
 
 ```
 ./gfe_driver -G /path/to/input/graph.properties -u -l <system_to_evaluate> -w <num_threads> -d output_results.sqlite3
 ```
+- **Deletions** : insert all vertices and edges from an input graph, in a random order, then delete all of them in random order. 
+Comment line 198~231 in experiment/details/insert_only.cpp, then recompile the gfe-driver and use following command to evaluate deletion performance:
 
-For LLAMA only: add the option `--build_frequency 10s` to asynchronously issue the creation of a new level (or delta) every 10 seconds.
+```
+./gfe_driver -G /path/to/input/graph.properties -u -l <system_to_evaluate> -w <num_threads> -d output_results.sqlite3
+```
 
 - **Updates**: perform all insertions and deletions from a log. Add the option --log /path/to/updates.graphlog :
 
 ```
 ./gfe_driver -G /path/to/input/graph.properties -u --log /path/to/updates.graphlog --aging_timeout 24h -l <system_to_evaluate> -w <num_threads> -d output_results.sqlite3
 ```
+
+Following parameters can be used to record memory footprint during the update process:
+
+```shell
+-aging_memfp --aging_memfp_physical --aging_memfp_threshold 500G --aging_release_memory=false
+```
+
+
+
+The option `--aging_timeout` serves to limit the total time to execute the experiment.
+The option `--aging_memfp` records the memory footprint as the experiment proceeds.
+The option `--aging_memfp_physical` records the physical memory (RSS) of the process rather than the virtual memory of the glibc allocator. 
+The option`--aging_memfp_threshold 500G` terminates the experiment if the memory footprint measured is greater than 330 GB .
+The option `--aging_release_memory=false` avoids releasing the memory used in the driver to load the graph from the file, as it may (or may not) recycled by the libraries. 
 
 - **Graphalytics**: execute the six kernels from the Graphalytics suite. Add the option `-R <N>` to repeat `N` times the execution of all Graphalytics kernels, one after the other. E.g., to run the kernels five times, after all vertices and edges have been inserted, use:
 
@@ -214,152 +203,79 @@ Type `./gfe_driver -h` for the full list of options and for the libraries that c
 in the library codes (e.g. teseo.**6**, stinger**3**) are unrelated to the versions of the systems evaluated, they were only used
 internally for development purposes.
 
-The database `output_results.sqlite3` will contain the final results. Refer to [this repository](https://github.com/whatsthecraic/gfe_notebooks) to see how to load and inspect the data within Jupyter notebooks and how to recreate the same plots of the paper.
+The database `output_results.sqlite3` will contain the final results. 
 
 ### Repeating the experiments
 
 These are the full commands to repeat the experiments in the paper:
 
-##### Access Patterns (Figure 2)
+##### Random Insertions
 
 ```bash
-# (a)
-./gfe_driver  -u  -R 5 -d results.sqlite3 -l mb-csr.8 -G /path/to/input/graph500-24.properties -w 56
-./gfe_driver  -u  -R 5 -d results.sqlite3 -l csr3-lcc-numa -G /path/to/input/graph500-24.properties -w 56 --load 
-./gfe_driver  -u  -R 5 -d results.sqlite3 -l sorted_vector_al.6 -G /path/to/input/graph500-24.properties -w 56
-
-# (b)
-./gfe_driver  -u  -R 5 -d results.sqlite3 -l sortledton.3 -G /path/to/input/graph500-24.properties -w 56 --block_size 16
-./gfe_driver  -u  -R 5 -d results.sqlite3 -l sortledton.3 -G /path/to/input/graph500-24.properties -w 56 --block_size 32
-./gfe_driver  -u  -R 5 -d results.sqlite3 -l sortledton.3 -G /path/to/input/graph500-24.properties -w 56 --block_size 64
-./gfe_driver  -u  -R 5 -d results.sqlite3 -l sortledton.3 -G /path/to/input/graph500-24.properties -w 56 --block_size 128
-./gfe_driver  -u  -R 5 -d results.sqlite3 -l sortledton.3 -G /path/to/input/graph500-24.properties -w 56 --block_size 256
-./gfe_driver  -u  -R 5 -d results.sqlite3 -l sortledton.3 -G /path/to/input/graph500-24.properties -w 56 --block_size 512
-./gfe_driver  -u  -R 5 -d results.sqlite3 -l sortledton.3 -G /path/to/input/graph500-24.properties -w 56 --block_size 1024
-
-# vs sortedvector
-#
-# (c)
-./gfe_driver  -u  -R 5 -d results.sqlite3 -l teseo-lcc.12 -G /path/to/input/graph500-24.properties -w 56
-./gfe_driver  -u  -R 5 -d results.sqlite3 -l teseo-lcc-dv.12b -G /path/to/input/graph500-24-dense.properties -w 56
+./gfe_driver -u -G /path/to/input/graph.properties -l stinger7-ref -w 56
+./gfe_driver -u -G /path/to/input/graph.properties -l g1_v6-ref-ignore-build -w 56
+./gfe_driver -u -G /path/to/input/graph.properties -l livegraph3_ro -w 56
+./gfe_driver -u -G /path/to/input/graph.properties -l teseo.13 -w 56
+./gfe_driver -u -G /path/to/input/graph.properties -l sortledton.4 -w 56
+./gfe_driver -u -G /path/to/input/graph.properties -l bvgt -w 56
 ```
 
-##### Block Size Insertion Speed (Figure 7)
+##### Sequential Insertions
 
 ```bash
-./gfe_driver  -u  -R 5 -d results.sqlite3 -l sorted_vector_al.6 -G /path/to/input/graph500-24.properties -w 56
-./gfe_driver  -u  -R 5 -d results.sqlite3 -l sortledton.3 -G /path/to/input/graph500-24.properties -w 56 --block_size 16
-./gfe_driver  -u  -R 5 -d results.sqlite3 -l sortledton.3 -G /path/to/input/graph500-24.properties -w 56 --block_size 32
-./gfe_driver  -u  -R 5 -d results.sqlite3 -l sortledton.3 -G /path/to/input/graph500-24.properties -w 56 --block_size 64
-./gfe_driver  -u  -R 5 -d results.sqlite3 -l sortledton.3 -G /path/to/input/graph500-24.properties -w 56 --block_size 128
-./gfe_driver  -u  -R 5 -d results.sqlite3 -l sortledton.3 -G /path/to/input/graph500-24.properties -w 56 --block_size 256
-./gfe_driver  -u  -R 5 -d results.sqlite3 -l sortledton.3 -G /path/to/input/graph500-24.properties -w 56 --block_size 512
-./gfe_driver  -u  -R 5 -d results.sqlite3 -l sortledton.3 -G /path/to/input/graph500-24.properties -w 56 --block_size 1024
+./gfe_driver -u -G /path/to/input/graph -l stinger7-ref -w 56 --is_timestamped true
+./gfe_driver -u -G /path/to/input/graph -l g1_v6-ref-ignore-build -w 56 --is_timestamped true
+./gfe_driver -u -G /path/to/input/graph -l livegraph3_ro -w 56 --is_timestamped true
+./gfe_driver -u -G /path/to/input/graph -l teseo.13 -w 56 --is_timestamped true
+./gfe_driver -u -G /path/to/input/graph -l sortledton.4 -w 56 --is_timestamped true
+./gfe_driver -u -G /path/to/input/graph -l bvgt -w 56 --is_timestamped true
 ```
 
-##### Direct Access (Figure 8)
-For all graphs with 5 runs.
+##### Memory Consumption
 
-```bash
-./gfe_driver  -u  -R 5 -d ./results.sqlite3 -l sorted_vector_al.6 -G /path/to/input/graph.properties -w 56
-./gfe_driver  -u  -R 5 -d ./results.sqlite3 -l edgeiter_sorted_vector_al.3 -G /path/to/input/graph.properties -w 56
+Comment line 92~99 in experiment/details/insert_only.cpp, then recompile the gfe-driver and use following command to evaluate deletion performance. The memory consumption during the loading process will be printed in the console.
+
+```shell
+./gfe_driver -u -G /path/to/input/graph.properties -l stinger7-ref -w 56 >> result.txt
+./gfe_driver -u -G /path/to/input/graph.properties -l g1_v6-ref-ignore-build -w 56  >> result.txt
+./gfe_driver -u -G /path/to/input/graph.properties -l livegraph3_ro -w 56  >> result.txt
+./gfe_driver -u -G /path/to/input/graph.properties -l teseo.13 -w 56 >> result.txt
+./gfe_driver -u -G /path/to/input/graph.properties -l sortledton.4 -w 56  >> result.txt
+./gfe_driver -u -G /path/to/input/graph.properties -l bvgt -w 56  >> result.txt
 ```
 
-##### Insertions and Graphalytics (Figure 9, 10 and 13)
+##### Graph Analytics
 
-For all graphs with 5 runs.
-```bash
-./gfe_driver  -u  -R 5 -d results.sqlite3 -l mb-csr.8 -G /path/to/input/graph.properties -w 56
-./gfe_driver  -u  -R 5 -d ./results.sqlite3 -l csr3-lcc-numa -G /path/to/input/graph.properties -w 56 --load
-./gfe_driver  -u  -R 5 -d ./results.sqlite3 -l teseo-lcc.12 -G /path/to/input/graph.properties -w 56
-./gfe_driver  -u  -R 5 -d ./results.sqlite3 -l teseo-lcc-dv.12b -G /path/to/input/graph.properties-dense -w 56
-./gfe_driver  -u  -R 5 -d ./results.sqlite3 -l stinger7-ref -G /path/to/input/graph.properties -w 56
-./gfe_driver  -u  -R 5 -d ./results.sqlite3 -l livegraph3_ro -G /path/to/input/graph.properties -w 20
-./gfe_driver  -u  -R 5 -d ./results.sqlite3 -l llama8-ref -G /path/to/input/graph.properties -w 16 --build_frequency 10s
-./gfe_driver  -u  -R 5 -d ./results.sqlite3 -l g1_v6-ref-ignore-build -G /path/to/input/graph.properties -w 20
-./gfe_driver  -u  -R 5 -d ./results.sqlite3 -l sortledton.3 -G /path/to/input/graph.properties -w 56 --block_size 512
+```shell
+./gfe_driver  -G /path/to/input/graph.properties -u -l csr3 --load -r 56 -R 5 --blacklist lcc,cdlp -d result.sqlite3
+./gfe_driver  -G /path/to/input/graph.properties -u -l csr3-lcc --load -r 56 -R 5 --blacklist cdlp -d result.sqlite3
+./gfe_driver  -G /path/to/input/graph.properties -u -l stinger7-ref -w 56 -r 56 -R 5 --blacklist cdlp -d result.sqlite3
+./gfe_driver  -G /path/to/input/graph.properties -u -l g1_v6-ref-ignore-build -w 56 -r 56 -R 5 --blacklist cdlp -d results_orkut.sqlite3
+./gfe_driver  -G /path/to/input/graph.properties -u -l livegraph3_ro -w 56 -r 56 -R 5 --blacklist cdlp -d result.sqlite3
+./gfe_driver  -G /path/to/input/graph.properties -u -l teseo.13 -w 56 -r 56 -R 5 --blacklist cdlp -d result.sqlite3
+./gfe_driver  -G /path/to/input/graph.properties -u -l sortledton.4 -w 56 -r 56 -R 5 --blacklist cdlp -d result.sqlite3
+./gfe_driver  -G /path/to/input/graph.properties -u -l bvgt -w 56 -r 56 -R 5 --blacklist cdlp -d result.sqlite3
 ```
 
-The graphs `graph.properties-dense` are analogous to their corresponding `graph.properties`,
-but with the vertices relabelled into a dense domain. These graphs are included in the archive
-loaded in [Zenodo](https://zenodo.org/record/3966439) and [dense friendster](https://zenodo.org/record/5146230).
+##### Scalability 
 
-For `yahoo-songs` and `wiki_edit` graphs with 5 runs:
-```bash
-# Ordered runs
-./gfe_driver  -u  -R 0 -d ./results.sqlite3 -l teseo-lcc.12 -G /path/to/input/graph -w 56 -r 32 --is_timestamped true
-./gfe_driver  -u  -R 0 -d ./results.sqlite3 -l stinger7-ref -G /path/to/input/graph -w 56 -r 32 --is_timestamped true
-./gfe_driver  -u  -R 0 -d ./results.sqlite3 -l livegraph3_ro -G /path/to/input/graph -w 20 -r 32 --is_timestamped true
-./gfe_driver  -u  -R 0 -d ./results.sqlite3 -l llama8-ref -G /path/to/input/graph -w 16 -r 32 --build_frequency 10s --is_timestamped true
-./gfe_driver  -u  -R 0 -d ./results.sqlite3 -l g1_v6-ref-ignore-build -G /path/to/input/graph -w 20 -r 32 --is_timestamped true
-./gfe_driver  -u  -R 0 -d ./results.sqlite3 -l sortledton.4 -G /path/to/input/graph -w 56 -r 32 --is_timestamped true --block_size 512
-
-# Shuffled runs
-./gfe_driver  -u  -R 0 -d ./results.sqlite3 -l teseo-lcc.12 -G /path/to/input/graph -w 56 -r 32
-./gfe_driver  -u  -R 0 -d ./results.sqlite3 -l stinger7-ref -G /path/to/input/graph -w 56 -r 32
-./gfe_driver  -u  -R 0 -d ./results.sqlite3 -l livegraph3_ro -G /path/to/input/graph -w 20 -r 32
-./gfe_driver  -u  -R 0 -d ./results.sqlite3 -l llama8-ref -G /path/to/input/graph -w 16 -r 32 --build_frequency 10s
-./gfe_driver  -u  -R 0 -d ./results.sqlite3 -l g1_v6-ref-ignore-build -G /path/to/input/graph -w 20 -r 32
-./gfe_driver  -u  -R 0 -d ./results.sqlite3 -l sortledton.4 -G /path/to/input/graph -w 56 -r 32 --block_size 512
-```
-
-Shuffled and ordered are not marked differently in the result database. This needs to be done manually; we
-run them on different machines.
-
-##### Scalability (Figure 12)
 For `graph500-24` and p in {1,2,4,8,14,28,42,56} and 5 runs.
 
 ```bash
-./gfe_driver  -u  -R 0 -d ./results.sqlite3 -l teseo-lcc.12 -G /path/to/input/graph.properties -w p
-./gfe_driver  -u  -R 0 -d ./results.sqlite3 -l teseo-lcc-dv.12b -G /path/to/input/graph.properties-dense -w p
-./gfe_driver  -u  -R 0 -d ./results.sqlite3 -l stinger7-ref -G /path/to/input/graph.properties -w p
-./gfe_driver  -u  -R 0 -d ./results.sqlite3 -l livegraph3_ro -G /path/to/input/graph.properties -w p
-./gfe_driver  -u  -R 0 -d ./results.sqlite3 -l llama8-ref -G /path/to/input/graph.properties -w p --build_frequency 10s
-./gfe_driver  -u  -R 0 -d ./results.sqlite3 -l g1_v6-ref-ignore-build -G /path/to/input/graph.properties -w p
-./gfe_driver  -u  -R 0 -d ./results.sqlite3 -l sortledton.3 -G /path/to/input/graph.properties -w p --block_size 512
+./gfe_driver  -u  -R 0 -d ./result.sqlite3 -l stinger7-ref -G /path/to/input/graph.properties -w p
+./gfe_driver  -u  -R 0 -d ./result.sqlite3 -l g1_v6-ref-ignore-build -G /path/to/input/graph.properties -w p
+./gfe_driver  -u  -R 0 -d ./result.sqlite3 -l livegraph3_ro -G /path/to/input/graph.properties -w p
+./gfe_driver  -u  -R 0 -d ./result.sqlite3 -l teseo.13 -G /path/to/input/graph.properties -w p
+./gfe_driver  -u  -R 0 -d ./result.sqlite3 -l sortledton.4 -G /path/to/input/graph.properties -w p
+./gfe_driver  -u  -R 0 -d ./result.sqlite3 -l bvgt -G /path/to/input/graph.properties -w p
 ```
 
-##### Updates (Figure 11)
-For `graph500-24` and `uniform-24` and the graphlogs from Zenodo.
-
-```bash
-./gfe_driver  -u  -R 0 -d ./results.sqlite3 -l teseo-lcc.12 -G /path/to/input/graph.properties -w 56 --log /path/to/graph/log --aging_timeout 10h --aging_memfp  --aging_memfp_physical  --aging_release_memory false
-./gfe_driver  -u  -R 0 -d ./results.sqlite3 -l stinger7-ref -G /path/to/input/graph.properties -w 56 --log /path/to/graph/log --aging_timeout 10h --aging_memfp  --aging_memfp_physical  --aging_release_memory false
-./gfe_driver  -u  -R 0 -d ./results.sqlite3 -l livegraph3_ro -G /path/to/input/graph.properties -w 20 --log /path/to/graph/log --aging_timeout 10h --aging_memfp  --aging_memfp_physical  --aging_release_memory false
-./gfe_driver  -u  -R 0 -d ./results.sqlite3 -l llama8-ref -G /path/to/input/graph.properties -w 16 --build_frequency 10s --log /path/to/graph/log --aging_timeout 10h --aging_memfp  --aging_memfp_physical  --aging_release_memory false --aging_memfp_threshold 230G
-./gfe_driver  -u  -R 0 -d ./results.sqlite3 -l g1_v6-ref-ignore-build -G /path/to/input/graph.properties -w 20 --log /path/to/graph/log --aging_timeout 10h --aging_memfp  --aging_memfp_physical  --aging_release_memory false
-./gfe_driver  -u  -R 0 -d ./results.sqlite3 -l sortledton.3 -G /path/to/input/graph.properties -w 56 --log /path/to/graph/log --aging_timeout 10h --aging_memfp  --aging_memfp_physical  --aging_release_memory false --block_size 512
-```
-
-The option `--aging_timeout` serves to limit the total time to execute the experiment.
-For LLAMA, it could be necessary to stop the experiment earlier, as the continuous creation of new deltas
-can cause a memory exhaustion.  
-For the experiment with the memory footprint of Figure 7d, add the arguments: 
-`--aging_memfp --aging_memfp_physical --aging_memfp_threshold 330G --aging_release_memory=false`.
-The option `--aging_memfp` records the memory footprint as the experiment proceeds,
-`--aging_memfp_physical` records the physical memory (RSS) of the process, rather than the virtual memory
-of the glibc allocator, `--aging_memfp_threshold 330G` terminates the experiment
-if the memory footprint measured is greater than 330 GB and 
-`--aging_release_memory=false` avoids releasing the memory used in the driver to load the graph 
-from the file, as it may (or may not) recycled by the libraries. 
-With the memory footprint, for LLAMA, it's not necessary to set `--aging_timeout 4h` as 
-`--aging_memfp_threshold 330G` already acts as a guard on the overall memory consumption.
-
-#### Mixed updates and analytics (Figure 14)
+##### Mixed updates and analytics (Figure 14)
 
 For all combinations of reading ($r in \[1, 2, 4, 8, 16, 32\]) and writing threads ($w in \[16, 48\]).
 ```bash
-# BFS
-./gfe_driver  -u  -R 3 -d results.sqlite3 -l sortledton.4 -G /path/to/graph500-24.properties -w $w -r $r --blacklist sssp,cdlp,pagerank,wcc,lcc --log /path/to/graph500-24-1.0.graphlog --aging_timeout 2h --mixed_workload true --block_size 512
+./gfe_driver  -u  -R 3 -d results.sqlite3 -l bvgt -G /path/to/graph500-24.properties -w $w -r $r --blacklist sssp,cdlp,pagerank,wcc,lcc --log /path/to/graph500-24-1.0.graphlog --aging_timeout 2h --mixed_workload true --block_size 512
 ./gfe_driver  -u  -R 3 -d results.sqlite3 -l livegraph3_ro -G /path/to/graph500-24.properties -w $w -r $r --blacklist sssp,cdlp,pagerank,wcc,lcc --log /path/to/graph500-24-1.0.graphlog --aging_timeout 2h --mixed_workload true
-
-# Pagerank
-./gfe_driver  -u  -R 3 -d results.sqlite3 -l sortledton.4 -G /path/to/graph500-24.properties -w $w -r $r --blacklist sssp,cdlp,bfs,wcc,lcc --log /path/to/graph500-24-1.0.graphlog --aging_timeout 2h --mixed_workload true --block_size 512
+./gfe_driver  -u  -R 3 -d results.sqlite3 -l bvgt -G /path/to/graph500-24.properties -w $w -r $r --blacklist sssp,cdlp,bfs,wcc,lcc --log /path/to/graph500-24-1.0.graphlog --aging_timeout 2h --mixed_workload true --block_size 512
 ./gfe_driver  -u  -R 3 -d results.sqlite3 -l livegraph3_ro -G /path/to/graph500-24.properties -w $w -r $r --blacklist sssp,cdlp,bfs,wcc,lcc --log /path/to/graph500-24-1.0.graphlog --aging_timeout 2h --mixed_workload true
 ```
-
-#### Produce Plots
-
-Download our data from [Zenodo](https://zenodo.org/record/5155577) or generate the data with scripts mentioned above.
-Then use the [GFE_Notebooks](https://github.com/PerFuchs/gfe_notebooks).
-Instructions for use within the other repository.

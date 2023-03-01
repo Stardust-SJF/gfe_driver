@@ -23,6 +23,7 @@ bool Dummy::add_vertex(uint64_t vertex_id) { return true; }
 bool Dummy::remove_vertex(uint64_t vertex_id){ return true; }
 bool Dummy::add_edge(graph::WeightedEdge e) { return true; }
 bool Dummy::add_edge_v2(graph::WeightedEdge e) { return true; }
+bool Dummy::update_edge(graph::WeightedEdge e) { return true; }
 bool Dummy::remove_edge(graph::Edge e){ return true; }
 void Dummy::set_timeout(uint64_t seconds) { }
 

@@ -100,6 +100,7 @@ void Aging2Master::init_workers() {
     LOG("[Aging2] Initialising " << parameters().m_num_threads << " worker threads ... ");
 
     m_workers.reserve(parameters().m_num_threads);
+//    std::cout << "m_num_threads: " << parameters().m_num_threads << std::endl;
     for(uint64_t worker_id = 1; worker_id < parameters().m_num_threads; worker_id++){
         m_workers.push_back ( new Aging2Worker(*this, worker_id) );
     }
@@ -126,9 +127,12 @@ void Aging2Master::load_edges(){
     reader::graphlog::set_marker(properties, handle, reader::graphlog::Section::EDGES);
 
     reader::graphlog::EdgeLoader loader(handle);
+    int i = 1;
+//    std::cout << "iteration " << i++ << std::endl;
     uint64_t num_edges = loader.load(array1, array_sz / 3);
     while( num_edges > 0 ){
         // partition the batch among the workers
+//        std::cout << "iteration " << i++ << std::endl;
         for(auto w: m_workers) w->load_edges(array1, num_edges);
         if(m_results.m_random_vertex_id == 0) { set_random_vertex_id(array1, num_edges); }
 

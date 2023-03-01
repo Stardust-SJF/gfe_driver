@@ -90,6 +90,10 @@ class Aging2Worker {
     template<bool with_latency>
     void graph_insert_edge(graph::WeightedEdge edge);
 
+    //Update Edge only for BVGT/Spruce
+    template<bool with_latency>
+    void graph_update_edge(graph::WeightedEdge edge);
+
     // Remove the given edge from the graph
     template<bool with_latency>
     void graph_remove_edge(graph::Edge edge, bool force = true);

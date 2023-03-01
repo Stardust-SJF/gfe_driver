@@ -186,6 +186,10 @@ namespace gfe::library {
       return inserted;
     }
 
+    bool SortledtonDriver::update_edge(gfe::graph::WeightedEdge e){
+        return true;
+    }
+
     bool SortledtonDriver::add_edge_v2(gfe::graph::WeightedEdge e) {
       assert(!m_is_directed);
 
@@ -331,9 +335,25 @@ namespace gfe::library {
 
     void SortledtonDriver::bfs(uint64_t source_vertex_id, const char *dump2file) {
       tm.register_thread(0);
+//      bool c;
+//        vector<gfe::graph::WeightedEdge> edges;
+//        int i = 0, j = 6;
+//        edges.push_back(gfe::graph::WeightedEdge{i, j, static_cast<double>(0.3)});
+//        c = SortledtonDriver::add_edge(edges[1]);
+//        if (!c) {
+//            std::cout << "insert edge " << i << "," << j << " failed" << std::endl;
+//        }
+//        else {
+//            std::cout << "insert edge " << i << "," << j << " successfully" << std::endl;
+//        }
       SnapshotTransaction tx = tm.getSnapshotTransaction(ds, false);
 
-      run_gc();
+
+//      run_gc();
+
+
+
+
 
       auto physical_src = tx.physical_id(source_vertex_id);
 
@@ -346,6 +366,27 @@ namespace gfe::library {
       cout << "Translation took " << t << endl;
       tm.transactionCompleted(tx);
 
+        //test insertion after run_gc
+//        bool a, b;
+//        a = SortledtonDriver::add_vertex(2);
+////        vector<gfe::graph::WeightedEdge> edges;
+//        i = 0; j = 2;
+//        edges.push_back(gfe::graph::WeightedEdge{i, j, static_cast<double>(0.3)});
+//        b = SortledtonDriver::add_edge(edges[1]);
+//        if (!a) {
+//            std::cout << "insert vertex failed" << std::endl;
+//        }
+//        else {
+//            std::cout << "insert vertex 2 successfully" << std::endl;
+//        }
+//        if (!b) {
+//            std::cout << "insert edge " << i << "," << j << " failed" << std::endl;
+//        }
+//        else {
+//            std::cout << "insert edge " << i << "," << j << " successfully" << std::endl;
+//        }
+//        gced=false;
+
       if (dump2file != nullptr) {
         save_bfs(external_ids, dump2file);
       }
@@ -357,7 +398,7 @@ namespace gfe::library {
       tm.register_thread(0);
       SnapshotTransaction tx = tm.getSnapshotTransaction(ds, false);
 
-      run_gc();
+//      run_gc();   //test without gc
 
       auto pr = PageRank::page_rank_bs(tx, num_iterations, damping_factor);;
       auto external_ids = translate<double>(tx, pr);
@@ -374,7 +415,7 @@ namespace gfe::library {
       tm.register_thread(0);
       SnapshotTransaction tx = tm.getSnapshotTransaction(ds, false);
 
-      run_gc();
+//      run_gc();
 
 
       auto clusters = WCC::gapbs_wcc(tx);
@@ -392,7 +433,7 @@ namespace gfe::library {
       tm.register_thread(0);
       SnapshotTransaction tx = tm.getSnapshotTransaction(ds, false);
 
-      run_gc();
+//      run_gc();
 
       auto clusters = CDLP::teseo_cdlp(tx, max_iterations);
       auto external_ids = translate<uint64_t>(tx, clusters);
@@ -409,7 +450,7 @@ namespace gfe::library {
       tm.register_thread(0);
       SnapshotTransaction tx = tm.getSnapshotTransaction(ds, false);
 
-      run_gc();
+//      run_gc();
 
       auto physical_src = tx.physical_id(source_vertex_id);
 
@@ -654,12 +695,16 @@ namespace gfe::library {
       tm.register_thread(0);
       SnapshotTransaction tx = tm.getSnapshotTransaction(ds, false);
 
-      run_gc();
+//      run_gc();
 
 
-      auto lcc_values = GFELCC::execute(tx);
+//      auto lcc_values = GFELCC::execute(tx);
+        auto lcc_values = LCC::lcc_merge_sort(tx);
+//      for (int i = 0; i < 10; i++) {
+//          std::cout << lcc_values[i] << std::endl;
+//      }
 
-//      auto lcc_values = LCC::lcc_merge_sort(tx);
+
       auto external_ids = translate<double>(tx, lcc_values);
 
       tm.transactionCompleted(tx);

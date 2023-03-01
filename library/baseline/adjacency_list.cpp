@@ -205,6 +205,15 @@ bool AdjacencyList::add_vertex0(uint64_t vertex_id){
     return pair.second;
 }
 
+/**
+     * Update Edge, only for bvgt/Spruce
+     * @param e
+     * @return
+     */
+    bool AdjacencyList::update_edge(gfe::graph::WeightedEdge e) {
+        return true;
+    }
+
 bool AdjacencyList::remove_vertex(uint64_t vertex_id){
     if(is_thread_safe()){
         scoped_lock<mutex_t> lock(m_mutex);

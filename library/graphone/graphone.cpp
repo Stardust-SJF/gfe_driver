@@ -407,6 +407,11 @@ bool GraphOne::add_edge(gfe::graph::WeightedEdge e){
     }
 }
 
+bool GraphOne::update_edge(gfe::graph::WeightedEdge e) {
+    return true;
+};
+
+
 bool GraphOne::add_edge_v2(gfe::graph::WeightedEdge e){
     COUT_DEBUG("Edge: " << e);
 
@@ -879,7 +884,7 @@ unique_ptr<int64_t[]> graphone_gapbs_bfs(uint64_t v_count, uint64_t num_out_edge
     int64_t distance = 1; // current distance
     while (!timer.is_timeout() && !queue.empty()) {
 
-        if (scout_count > edges_to_check / alpha) {
+        if (/*scout_count > edges_to_check / alpha*/0) {
             int64_t awake_count, old_awake_count;
             graphone_gapbs_bfs_QueueToBitmap(queue, front);
             awake_count = queue.size();

@@ -65,6 +65,10 @@
 #include "sortledton_v2/sortledton_driver_v2.hpp"
 #endif
 
+#if defined(HAVE_BVGT)
+#include "bvgt/bvgt_driver.h"
+#endif
+
 #if defined(HAVE_MICROBENCHMARKS)
 #include "microbenchmarks/microbenchmarks_driver.hpp"
 #endif
@@ -225,6 +229,21 @@ std::unique_ptr<Interface> generate_teseo_real_vtx_lcc(bool directed_graph){
 }
 #endif
 
+#if defined(HAVE_BVGT)
+std::unique_ptr<Interface> generate_bvgt(bool directed_graph){
+    return unique_ptr<Interface>{ new BVGTDriver(directed_graph) };
+}
+//std::unique_ptr<Interface> generate_bvgt_weighted(bool directed_graph){
+//    return unique_ptr<Interface>{ new BVGTDriverWeighted(directed_graph)};
+//}
+//std::unique_ptr<Interface> generate_bvgt_64(bool directed_graph){
+//    return unique_ptr<Interface>{ new BVGTDriver(directed_graph) };
+//}
+//std::unique_ptr<Interface> generate_bvgt_weighted_64(bool directed_graph){
+//    return unique_ptr<Interface>{ new BVGTDriverWeighted(directed_graph)};
+//}
+#endif
+
 #if defined(HAVE_SORTLEDTON)
 std::unique_ptr<Interface> generate_sortledton(bool directed_graph) {
     auto& config = configuration();
@@ -341,6 +360,13 @@ vector<ImplementationManifest> implementations() {
     result.emplace_back("teseo-lcc.13", "Teseo with a tuned implementation of the LCC kernel", &generate_teseo_lcc);
     result.emplace_back("teseo-dv.13b", "Teseo, dense vertices", &generate_teseo_real_vtx);
     result.emplace_back("teseo-lcc-dv.13b", "Teseo, dense vertices and sort-merge implementation of the LCC kernel", &generate_teseo_real_vtx_lcc);
+#endif
+
+#if defined(HAVE_BVGT)
+    result.emplace_back("bvgt", "Spruce", &generate_bvgt);
+//    result.emplace_back("bvgt-weighted", "BVGT for weighted graph", &generate_bvgt_weighted);
+//    result.emplace_back("bvgt-64", "BVGT for 8B edges", &generate_bvgt_64);
+//   result.emplace_back("bvgt-weighted", "BVGT for weighted graph", &generate_bvgt_weighted_64);
 #endif
 
 #if defined(HAVE_SORTLEDTON)

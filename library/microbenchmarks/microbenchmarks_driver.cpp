@@ -149,6 +149,10 @@ namespace gfe::library {
       }
     }
 
+    bool MicroBenchmarksDriver:: update_edge(gfe::graph::WeightedEdge e){
+        return true;
+    }
+
     bool MicroBenchmarksDriver::add_edge_v2(gfe::graph::WeightedEdge e) {
       {
         vertex_mapping::const_accessor a;

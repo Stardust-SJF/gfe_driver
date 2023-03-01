@@ -649,7 +649,7 @@ unique_ptr<int64_t[]> CSR::do_bfs(uint64_t root, utility::TimeoutService& timer,
     int64_t distance = 1; // current distance
     while (!timer.is_timeout() && !queue.empty()) {
 
-        if (scout_count > edges_to_check / alpha) {
+        if (0/*scout_count > edges_to_check / alpha*/) {
             int64_t awake_count, old_awake_count;
             do_bfs_QueueToBitmap(queue, front);
             awake_count = queue.size();
@@ -1193,6 +1193,10 @@ unique_ptr<double[]> CSR::do_lcc_undirected(utility::TimeoutService& timer) cons
         uint64_t max_num_edges = v_degree_out * (v_degree_out -1);
         lcc[v] = static_cast<double>(num_triangles) / max_num_edges;
         COUT_DEBUG_LCC("Score computed: " << (num_triangles) << "/" << max_num_edges << " = " << lcc[v]);
+    }
+    std::cout << "lcc[0~9]" << std::endl;
+    for (int i = 0; i < 10; i++) {
+        std::cout << lcc[i] << std::endl;
     }
     return ptr_lcc;
 }

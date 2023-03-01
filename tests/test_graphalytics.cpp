@@ -49,6 +49,11 @@
 #if defined(HAVE_SORTLEDTON)
 #include "library/sortledton/sortledton_driver.hpp"
 #endif
+
+#if defined(HAVE_BVGT)
+#include "bvgt/bvgt_driver.h"
+#endif
+
 #include "library/interface.hpp"
 #include "reader/graphalytics_reader.hpp"
 #include "utility/graphalytics_validate.hpp"
@@ -423,4 +428,44 @@ TEST(Sortledton, GraphalyticsUndirected){
     cout << "Graph loaded" << endl;
     validate(graph.get(), path_example_undirected, GA_BFS | GA_PAGERANK | GA_WCC | GA_CDLP | GA_LCC | GA_SSSP, false);
 }
+#endif
+
+#if defined(HAVE_BVGT)
+TEST(BVGT, GraphalyticsDirected){
+    auto graph = make_unique<BVGT>(/* directed */ true);
+    load_graph(graph.get(), path_example_directed);
+    validate(graph.get(), path_example_directed);
+}
+
+TEST(Stinger, GraphalyticsUndirected){
+    auto graph = make_unique<BVGT>(/* directed */ false);
+    load_graph(graph.get(), path_example_undirected);
+    validate(graph.get(), path_example_undirected);
+}
+
+TEST(BVGT, GraphalyticsDirectedWeighted){
+    auto graph = make_unique<BVGTWeighted>(/* directed */ true);
+    load_graph(graph.get(), path_example_directed);
+    validate(graph.get(), path_example_directed);
+}
+
+TEST(BVGT, GraphalyticsUndirectedWeighted){
+    auto graph = make_unique<BVGTWeighted>(/* directed */ false);
+    load_graph(graph.get(), path_example_undirected);
+    validate(graph.get(), path_example_undirected);
+}
+
+TEST(BVGT, GraphalyticsDirectedWeighted64){
+    auto graph = make_unique<BVGTWeighted64>(/* directed */ true);
+    load_graph(graph.get(), path_example_directed);
+    validate(graph.get(), path_example_directed);
+}
+
+TEST(BVGT, GraphalyticsUndirectedWeighted64){
+    auto graph = make_unique<BVGTWeighted64>(/* directed */ false);
+    load_graph(graph.get(), path_example_undirected);
+    validate(graph.get(), path_example_undirected);
+}
+
+
 #endif

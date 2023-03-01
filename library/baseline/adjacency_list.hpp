@@ -150,6 +150,13 @@ public:
     virtual bool add_edge_v2(gfe::graph::WeightedEdge e);
 
     /**
+     * Update Edge, only for bvgt/Spruce
+     * @param e
+     * @return
+     */
+    virtual bool update_edge(gfe::graph::WeightedEdge e);
+
+    /**
      * Remove the given edge from the graph
      * @return true if the given edge has been removed, false otherwise (e.g. this edge does not exist)
      */
