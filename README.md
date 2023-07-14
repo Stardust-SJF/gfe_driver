@@ -2,7 +2,7 @@
 GFE Driver
 ---
 
-The GFE (Graph Framework Evaluation) Driver is the program used to run the experiments in "Spruce: a Fast, Space-saving Structure for Dynamic Graph Storage", measuring the throughput of updates in libraries supporting structural dynamic graphs and the completion times of the [Graphalytics kernels](https://github.com/ldbc/ldbc_graphalytics). 
+The GFE (Graph Framework Evaluation) Driver is the program used to run the experiments in "Spruce: a Fast yet Space-saving Structure for Dynamic Graph Storage", measuring the throughput of updates in libraries supporting structural dynamic graphs and the completion times of the [Graphalytics kernels](https://github.com/ldbc/ldbc_graphalytics). 
 The driver supports the following structures: Spruce, [Sortledton](https://gitlab.db.in.tum.de/per.fuchs/sortledton), [Teseo](https://github.com/cwida/teseo), [GraphOne](https://github.com/the-data-lab/GraphOne), 
 [Stinger](http://stingergraph.com/) and [LiveGraph](https://github.com/thu-pacman/LiveGraph-Binary). 
 It can run several kinds experiments: insert/delete all edges in a random permuted order from an input graph, 
@@ -19,6 +19,7 @@ The core codes of Spruce could be found at [Spruce](https://github.com/Stardust-
 - [libpapi 5.5 +](http://icl.utk.edu/papi/)
 - [SQLite 3.27 +](https://sqlite.org)
 - Intel Threading Building Blocks 2 (version 2020.1-2)
+- jemalloc 5.2.1+
 - Disable NUMA balancing feature to avoid the Linux Kernel to swap pages during insertions: `echo 0 | sudo tee  /proc/sys/kernel/numa_balancing`
 
 #### Configure
