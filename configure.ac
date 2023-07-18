@@ -133,6 +133,12 @@ AX_LIB_SQLITE3()
 LIBS="${SQLITE3_LDFLAGS} ${LIBS}"
 
 #############################################################################
+#jemalloc for memory consumption (more precise)
+if( test x"${enable_mem_analysis}" = x"yes" ); then
+    LIBS="${LIBS} -ljemalloc"
+fi
+
+#############################################################################
 # Debug flags (-g)
 MY_ARG_ENABLE([debug], 
     [Whether to enable the debug flags], 
@@ -685,8 +691,7 @@ if ( test x"${with_bvgt}" != x"" && test x"${with_bvgt}" != "no" ); then
     AC_CHECK_FILE([${path_bvgt_library}], [  ],  [ AC_MSG_ERROR([file not found: ${path_bvgt_library}]) ])
 
 
-    # TODOfinished clean up include structure in bvgt
-    AS_VAR_SET([LIBS], ["-L${path_bvgt} -lBVGT ${LIBS}"])
+    AS_VAR_SET([LIBS], ["-L${path_bvgt} -lBVGT ${LIBS} -ljunction"])
 
     AC_MSG_NOTICE([BVGT support enabled])
     AS_VAR_APPEND([CPPFLAGS], [" -DHAVE_BVGT"])

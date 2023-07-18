@@ -73,6 +73,9 @@ void InsertOnly::execute_round_robin(){
 
     atomic<uint64_t> start_chunk_next = 0;
     atomic<int> tempp = m_stream.get()->num_edges()/100;
+#if defined(HAVE_BVGT)
+    m_interface.get()->add_vertex(m_stream.get()->max_vertex_id() + 1);
+#endif
     for(int64_t i = 0; i < m_num_threads; i++){
         threads.emplace_back([this, &start_chunk_next, &tempp](int thread_id){
 //            LOG(thread_id);
@@ -88,15 +91,15 @@ void InsertOnly::execute_round_robin(){
 //            int temp = size/100;
             while( (start = start_chunk_next.fetch_add(m_scheduler_granularity)) < size ){
                 uint64_t end = std::min<uint64_t>(start + m_scheduler_granularity, size);
-                //if case is used to monitor mem, comment if and tempp for testing insertion speed
-//                if(thread_id==0) {
-//                    if (end > tempp) {
-//                        int64_t memll = common::get_memory_footprint();
-//                        LOG(memll-memllb);
-//                        tempp += size / 100;
-////                        LOG(tempp << " " << memll);
-//                    }
-//                }
+                //if case is used to monitor mem, comment if and tempp for testing insertion speed (following 8 lines)
+                if(thread_id==0) {
+                    if (end > tempp) {
+                        int64_t memll = common::get_memory_footprint();
+                        LOG(memll-memllb);
+                        tempp += size / 100;
+//                        LOG(tempp << " " << memll);
+                    }
+                }
                 run_sequential(interface, graph, start, end);
             }
 
@@ -113,6 +116,7 @@ void InsertOnly::execute_round_robin_delete(){
     vector<thread> threads;
 
     atomic<uint64_t> start_chunk_next = 0;
+
 
     for(int64_t i = 0; i < m_num_threads; i++){
         threads.emplace_back([this, &start_chunk_next](int thread_id){
@@ -202,6 +206,7 @@ chrono::microseconds InsertOnly::execute() {
 //    }
 //
 //
+////    auto before = common::get_memory_footprint();
 //    // Execute the insertions
 //    m_interface->on_main_init(m_num_threads /* build thread */ +1);
 //    m_interface->updates_start();
@@ -210,15 +215,20 @@ chrono::microseconds InsertOnly::execute() {
 //    execute_round_robin_delete();
 //    build_service2.stop();
 //    timer.stop();
+////    auto after = common::get_memory_footprint();
+////    LOG("Memory consumption: " << after - before);
 //    m_interface->updates_stop();
 //    LOG("Deletions performed with " << m_num_threads << " threads in " << timer);
 //    m_time_insert = timer.microseconds();
 //    m_num_build_invocations = build_service2.num_invocations();
 //
+//    // A final invocation of the method #build()
 //    m_interface->on_thread_init(0);
+////    LOG("Init successfully");
 //    timer.start();
 //    m_interface->build();
 //    timer.stop();
+////    LOG("Build successfully");
 //    m_time_build = timer.microseconds();
 //    if(m_time_build > 0){
 //        LOG("Build time: " << timer);
@@ -229,7 +239,6 @@ chrono::microseconds InsertOnly::execute() {
 //
 //    m_interface->on_thread_destroy(0);
 //    m_interface->on_main_destroy();
-
     //Delete finshed
 
     return chrono::microseconds{ m_time_insert + m_time_build };

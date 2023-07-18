@@ -10,6 +10,7 @@
 #include <vector>
 #include "library/interface.hpp"
 #include "../../../../../index_algorithms.h"
+#include "../../../../../spruce_transaction.h"
 #include "../../../../../graph_algorithms.h"
 #include "../../../../../third_party/gapbs/src/pr_spmv.h"
 #include "../../../../../third_party/gapbs/src/bfs.h"
@@ -34,10 +35,12 @@ namespace gfe::library {
 //    void save_results(std::vector<std::pair<uint64_t, T>>& result, const char* dump2file);
     public:
         /**
-         * Create an instance of Teseo
+         * Create an instance of Spruce
          * @param is_directed: whether the underlying graph should be directed or undirected
          * @param read_only: whether to use read-only transactions for the algorithms in graphalytics
          */
+
+
         BVGTDriver(bool is_directed);
 
         /**

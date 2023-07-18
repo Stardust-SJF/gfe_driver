@@ -11,8 +11,8 @@ namespace gfe::library {
  *  Init                                                                     *
  *                                                                           *
  *****************************************************************************/
-    BVGTDriver::BVGTDriver(bool is_directed) : top_block(new SprucePlus::TopBlock),
-                                               m_is_directed(is_directed), vertex_num(16777217),
+    BVGTDriver::BVGTDriver(bool is_directed) : top_block(new SpruceTransVer::TopBlock),
+                                               m_is_directed(is_directed), vertex_num(317728),
     edge_num(0){
 //        if (is_directed == true) { throw std::invalid_argument("Graph is directed"); }
 //        else {
@@ -79,7 +79,8 @@ namespace gfe::library {
     }
 
     bool BVGTDriver::add_vertex(uint64_t vertex_id) {
-
+        // using add_vertex to change vertex_num
+        vertex_num = vertex_id;
         return true;
     }
 
@@ -90,21 +91,21 @@ namespace gfe::library {
 
     bool BVGTDriver::add_edge(gfe::graph::WeightedEdge e) {
         edge_num++;
-        return SprucePlus::InsertEdge((SprucePlus::TopBlock*)top_block, SprucePlus::WeightedEdge{(uint32_t)e.m_source, (uint32_t)e.m_destination, (float)e.m_weight});
+        return SpruceTransVer::InsertEdge((SpruceTransVer::TopBlock*)top_block, SpruceTransVer::WeightedEdge{(uint32_t)e.m_source, (uint32_t)e.m_destination, (float)e.m_weight});
     }
 
     bool BVGTDriver::add_edge_v2(gfe::graph::WeightedEdge e) {
         edge_num++;
         // for graph analysis
-        if (e.m_destination >= vertex_num) vertex_num = e.m_destination + 1;
-        if (e.m_source >= vertex_num) vertex_num = e.m_source + 1;
+//        if (e.m_destination >= vertex_num) vertex_num = e.m_destination + 1;
+//        if (e.m_source >= vertex_num) vertex_num = e.m_source + 1;
 
 //       if(!is_directed()){
-           SprucePlus::InsertEdge((SprucePlus::TopBlock*)top_block, SprucePlus::WeightedEdge{(uint32_t)e.m_source, (uint32_t)e.m_destination, (float)e.m_weight});
-        SprucePlus::InsertEdge((SprucePlus::TopBlock*)top_block, SprucePlus::WeightedEdge{(uint32_t)e.m_destination, (uint32_t)e.m_source, (float)e.m_weight});
+        SpruceTransVer::InsertEdge((SpruceTransVer::TopBlock*)top_block, SpruceTransVer::WeightedEdge{(uint32_t)e.m_source, (uint32_t)e.m_destination, (float)e.m_weight});
+        SpruceTransVer::InsertEdge((SpruceTransVer::TopBlock*)top_block, SpruceTransVer::WeightedEdge{(uint32_t)e.m_destination, (uint32_t)e.m_source, (float)e.m_weight});
 //        }
 //       else {
-//           SprucePlus::InsertEdge((SprucePlus::TopBlock*)top_block, SprucePlus::WeightedEdge{(uint32_t)e.m_source, (uint32_t)e.m_destination, (float)e.m_weight});
+//           SpruceTransVer::InsertEdge((SpruceTransVer::TopBlock*)top_block, SpruceTransVer::WeightedEdge{(uint32_t)e.m_source, (uint32_t)e.m_destination, (float)e.m_weight});
 //       }
         return true;
     }
@@ -117,15 +118,15 @@ namespace gfe::library {
 //            if (e.m_destination >= vertex_num) {vertex_num = e.m_destination + 1; std::cout <<vertex_num << std::endl;}
 //            if (e.m_source >= vertex_num) {vertex_num = e.m_source + 1; std::cout <<vertex_num << std::endl; }
 //        }
-        SprucePlus::UpdateEdge((SprucePlus::TopBlock*)top_block, SprucePlus::WeightedEdge{(uint32_t)e.m_destination, (uint32_t)e.m_source, (float)e.m_weight});
-        return SprucePlus::UpdateEdge((SprucePlus::TopBlock*)top_block, SprucePlus::WeightedEdge{(uint32_t)e.m_source, (uint32_t)e.m_destination, (float)e.m_weight});
+        SpruceTransVer::UpdateEdge((SpruceTransVer::TopBlock*)top_block, SpruceTransVer::WeightedEdge{(uint32_t)e.m_destination, (uint32_t)e.m_source, (float)e.m_weight});
+        return SpruceTransVer::UpdateEdge((SpruceTransVer::TopBlock*)top_block, SpruceTransVer::WeightedEdge{(uint32_t)e.m_source, (uint32_t)e.m_destination, (float)e.m_weight});
 //        return true;
     }
 
     bool BVGTDriver::remove_edge(gfe::graph::Edge e) {
         edge_num--;
-        SprucePlus::DeleteEdge((SprucePlus::TopBlock*)top_block, (uint32_t)e.m_source, (uint32_t)e.m_destination);
-        SprucePlus::DeleteEdge((SprucePlus::TopBlock*)top_block, (uint32_t)e.m_destination, (uint32_t)e.m_source);
+        SpruceTransVer::DeleteEdge((SpruceTransVer::TopBlock*)top_block, (uint32_t)e.m_source, (uint32_t)e.m_destination);
+        SpruceTransVer::DeleteEdge((SpruceTransVer::TopBlock*)top_block, (uint32_t)e.m_destination, (uint32_t)e.m_source);
         return true;
     }
 
@@ -183,9 +184,9 @@ them in parent array as negative numbers. Thus the encoding of parent is:
 
 
         void BVGTDriver::bfs(uint64_t source_vertex_id, const char* dump2file) {
-        std::vector<SprucePlus::WeightedOutEdge> neighbours;
-        SprucePlus::get_neighbours((SprucePlus::TopBlock*)top_block, source_vertex_id, neighbours);
-        DOBFS((SprucePlus::TopBlock*)top_block, (uint32_t)source_vertex_id, vertex_num, edge_num, neighbours.size());
+        std::vector<uint32_t> neighbours;
+        SpruceTransVer::get_neighbours_only((SpruceTransVer::TopBlock*)top_block, source_vertex_id, neighbours);
+        DOBFS((SpruceTransVer::TopBlock*)top_block, (uint32_t)source_vertex_id, vertex_num, edge_num, neighbours.size());
         }
 
 /*****************************************************************************
@@ -240,7 +241,7 @@ updates in the pull direction to remove the need for atomics.
 
 
         void BVGTDriver::pagerank(uint64_t num_iterations, double damping_factor, const char* dump2file) {
-            PageRankPull((SprucePlus::TopBlock*)top_block, num_iterations, vertex_num);
+            PageRankPull((SpruceTransVer::TopBlock*)top_block, num_iterations, vertex_num);
         }
 
 /*****************************************************************************
@@ -308,7 +309,7 @@ more consistent performance for undirected graphs.
 // independent of the edge's direction.
 
         void BVGTDriver::wcc(const char* dump2file) {
-            ShiloachVishkin((SprucePlus::TopBlock*)top_block, vertex_num);
+            ShiloachVishkin((SpruceTransVer::TopBlock*)top_block, vertex_num);
         }
 
 /*****************************************************************************
@@ -321,7 +322,7 @@ more consistent performance for undirected graphs.
 
 
         void BVGTDriver::cdlp(uint64_t max_iterations, const char* dump2file) {
-            cdlp_m((SprucePlus::TopBlock*)top_block, max_iterations, vertex_num);
+            cdlp_m((SpruceTransVer::TopBlock*)top_block, max_iterations, vertex_num);
         }
 
 /*****************************************************************************
@@ -341,7 +342,7 @@ more consistent performance for undirected graphs.
 
 
         void BVGTDriver::lcc(const char* dump2file) {
-            OrderedCount((SprucePlus::TopBlock*)top_block, vertex_num);
+            OrderedCount((SpruceTransVer::TopBlock*)top_block, vertex_num);
         }
 
 /*****************************************************************************
@@ -380,7 +381,7 @@ more consistent performance for undirected graphs.
 
 
         void BVGTDriver::sssp(uint64_t source_vertex_id, const char* dump2file) {
-            DeltaStep((SprucePlus::TopBlock*)top_block, source_vertex_id, 2.0, vertex_num, edge_num);
+            DeltaStep((SpruceTransVer::TopBlock*)top_block, source_vertex_id, 2.0, vertex_num, edge_num);
         }
 
 /*****************************************************************************
