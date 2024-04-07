@@ -233,11 +233,17 @@ These are the full commands to repeat the experiments in the paper:
 ./gfe_driver -u -G /path/to/input/graph -l bvgt -w 56 --is_timestamped true
 ```
 
+##### Deletions
+Comment line 198~231 in experiment/details/insert_only.cpp, then recompile the gfe-driver. The commands to evaluate are the same as above.
+
 ##### Memory Consumption
 
-Comment line 92~99 in experiment/details/insert_only.cpp, then recompile the gfe-driver and use following command to evaluate deletion performance. The memory consumption during the loading process will be printed in the console.
+Comment line 92~99 in experiment/details/insert_only.cpp, then recompile the gfe-driver and use the following command to evaluate deletion performance. The memory consumption during the loading process will be printed in the console.
 
 ```shell
+mkdir build && cd build
+../configure --enable-optimize --enable-mem-analysis --disable-debug --with-bvgt=/path/to/spruce/build/
+make -j
 ./gfe_driver -u -G /path/to/input/graph.properties -l stinger7-ref -w 56 >> result.txt
 ./gfe_driver -u -G /path/to/input/graph.properties -l g1_v6-ref-ignore-build -w 56  >> result.txt
 ./gfe_driver -u -G /path/to/input/graph.properties -l livegraph3_ro -w 56  >> result.txt
