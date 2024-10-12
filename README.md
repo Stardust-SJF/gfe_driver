@@ -154,9 +154,10 @@ In our experiments, we used the following input graphs and data sets:
 - The logs for the experiments with updates, i.e. with both insertions and deletions,
   were generated with another [ad-hoc tool](https://github.com/whatsthecraic/graphlog). 
 - `yahoo-songs` was taken from the [Konect webpage](http://konect.cc/networks/) they were prepared 
-  for our experiments by sorting them by timestamp and removing duplicates by using `tools/timestampd_graph_2_edge_list.py`.  
+  for our experiments by sorting them by timestamp and removing duplicates.  
 - `livejournal`,`orkut` and `com-friendster` were taken from the [Stanford Large Network Dataset Collection](https://snap.stanford.edu/data/index.html).
 
+A complete image of all datasets used in the experiments can be downloaded here: [dota-league, graph500-SF, and uniform-SF](https://zenodo.org/record/3966439), [livejournal, orkut, and friendster](https://snap.stanford.edu/data/index.html), [graph logs](https://zenodo.org/record/3967002), and [yahoo-songs](https://zenodo.org/record/5752476).
 ### Executing the driver
 
 
