@@ -89,7 +89,7 @@ cd build
 
 Download the binary library from the [official repository](https://github.com/thu-pacman/LiveGraph-Binary/releases). 
 In the paper, we evaluated version 20200829. You need to download `liblivegraph.tar.gz` and extract `liblivegraph.so` into a folder.
-Then configure the driver by pointing the path to where the library has been downloading:
+Then configure the driver by pointing the path to where the library has been extracted:
 
 ```
 cd build
