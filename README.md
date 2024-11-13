@@ -61,7 +61,7 @@ cd build
 ../configure --enable-optimize --disable-debug --with-stinger=/path/to/stinger/build
 ```
 
-It is noted that you can build stinger in any directory, and only need to set the corresponding build directory when compiling gfe_driver.
+It is noted that you can build stinger in any directory, and only need to set the corresponding build directory when cofiguring gfe_driver.
 
 
 ##### GraphOne
