@@ -27,7 +27,7 @@ The core codes of Spruce could be found at [Spruce](https://github.com/Stardust-
 Initialise the sources and the configure script by:
 
 ```
-git clone https://github.com/PerFuchs/gfe_driver
+git clone https://github.com/Stardust-SJF/gfe_driver/
 cd gfe_driver
 git submodule update --init
 mkdir build && cd build
@@ -43,12 +43,12 @@ Instead, it is safer to reconfigure and rebuild the driver each time for a singl
 ##### Stinger
 Use the branch `feature/gfe `, it contains additional patches w.r.t. 
 [upstream](https://github.com/stingergraph/stinger), from https://github.com/whatsthecraic/stinger.
-For the paper, we evaluted commit "2bcfac38785081c7140b0cd27f3aecace088d664"
+For the paper, we evaluated commit "2bcfac38785081c7140b0cd27f3aecace088d664"
 
 ```
 git clone https://github.com/whatsthecraic/stinger -b feature/gfe
 cd stinger
-mkdir build && cd stinger
+mkdir build && cd build
 cmake ../ -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=0 
 make
 ```
@@ -57,9 +57,11 @@ If the build has been successful, it should at least create the executable `bin/
 Configure the GFE driver with:
 
 ```
-mkdir build && cd build
+cd build
 ../configure --enable-optimize --disable-debug --with-stinger=/path/to/stinger/build
 ```
+
+It is noted that you can build stinger in any directory, and only need to set the corresponding build directory when compiling gfe_driver.
 
 
 ##### GraphOne
@@ -79,18 +81,18 @@ If the build has been successful, it should at least create the executable `grap
 Then, configure the driver with:
 
 ```
-mkdir build && cd build
+cd build
 ../configure --enable-optimize --disable-debug --with-graphone=/path/to/graphone/build
 ```
 
 ##### LiveGraph
 
 Download the binary library from the [official repository](https://github.com/thu-pacman/LiveGraph-Binary/releases). 
-In the paper, we evaluated version 20200829.
+In the paper, we evaluated version 20200829. You need to download `liblivegraph.tar.gz` and extract `liblivegraph.so` into a folder.
 Then configure the driver by pointing the path to where the library has been downloading:
 
 ```
-mkdir build && cd build
+cd build
 ../configure --enable-optimize --disable-debug --with-livegraph=/path/to/livegraph/lib
 ```
 
@@ -102,7 +104,7 @@ In the paper, we evaluated version `14227577731d6369b5366613f3e4a679b1fd7694`.
 ```
 git clone https://github.com/cwida/teseo
 cd teseo
-./autoreconf -iv
+autoreconf -iv
 mkdir build && cd build
 ../configure --enable-optimize --disable-debug
 make -j
@@ -112,7 +114,7 @@ If the build has been successful, it should at least create the archive `libtese
 Then configure the driver with:
 
 ```
-mkdir build && cd build
+cd build
 ../configure --enable-optimize --disable-debug --with-teseo=/path/to/teseo/build   
 ```
 
@@ -124,18 +126,18 @@ Follow the instructions in the README of the repository to setup and build the l
 Then configure the driver with:
 
 ```
-mkdir build && cd build
-../configure --enable-optimize --disable-debug --with-sortledton=/path/to/microbenchmark/build  
+cd build
+../configure --enable-optimize --disable-debug --with-sortledton=/path/to/sortledton/build  
 ```
 
 ##### Spruce
 
-Use the library in our GitHub Release Page:
+Use the library in our [GitHub Release Page](https://github.com/Stardust-SJF/gfe_driver/releases/tag/v2.0.0). We note that the BVGT is the initial name of Spruce (BitVector-based-Graph-Tree), and we have not changed it in gfe_driver.
 
 Then configure the driver with:
 
 ````````shell
-mkdir build && cd build
+cd build
 ../configure --enable-optimize --disable-debug --with-bvgt=/path/to/spruce/build/
 ````````
 
@@ -144,6 +146,17 @@ mkdir build && cd build
 Once configured, run `make -j`. There is no `install` target, the final artifact is the executable `gfe_driver`. 
 
 If in the mood of running the testsuite, type `make check -j`.
+
+If you meet errors like:
+```shell
+/home/ubuntu/gfe_driver/third-party/libcommon/src/system_introspection.cpp:110:21: note: returned from ‘FILE* popen(const char*, const char*)’
+  110 |     FILE* fp = popen("git log -1 | awk 'NR == 1 && $1 == \"commit\" {print $2}'", "r");
+      |                ~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cc1plus: all warnings being treated as errors
+```
+,you can try to run "make -j CXX_FLAGS="-Wno-error", or replace `fclose(fp)` with `pclose(fp)` in `gfe_driver/build/third-party/libcommon/src/system_introspection.cpp`. 
+
+
 
 ### Datasets
 
@@ -158,10 +171,19 @@ In our experiments, we used the following input graphs and data sets:
 - `livejournal`,`orkut` and `com-friendster` were taken from the [Stanford Large Network Dataset Collection](https://snap.stanford.edu/data/index.html).
 
 A complete image of all datasets used in the experiments can be downloaded here: [dota-league, graph500-SF, and uniform-SF](https://zenodo.org/record/3966439), [livejournal, orkut, and friendster](https://snap.stanford.edu/data/index.html), [graph logs](https://zenodo.org/record/3967002), and [yahoo-songs](https://zenodo.org/record/5752476).
+
+#### About dataset format:
+GFE driver supports two types of graph formats: 
+1. Plain edge list (ends with ".el"): The file contains pairs of vertex IDs, with each edge represented by a line of two space-separated integers indicating connections.
+2. Edge-Vertex Separated format, which contains 3 files:
+   - `graph.properties`: A file contains graph properties, including filenames for the vertex and edge files, the number of vertices and edges, whether the graph is directed, and specific parameters for running graph algorithms.
+   - `graph.v`: A list of unique vertices present in the graph, with each line in the file representing a unique vertex ID.
+   - `graph.e`: A list of edges from the graph, with each line representing a edge in the format `from_node_id to_node_id`.
+
 ### Executing the driver
 
 
-The driver takes as input a list of options together with a graph, and emits the results into a sqlite3 database.
+The driver takes as input a list of options together with a graph, and emits the results into a sqlite3 database. We note that 256GB of memory is needed to run all the experiments due to the large sizes of some graphs (e.g., uniform-26, and Friendster).
 There are three kinds of experiments that can be executed:
 
 - **Insertions only** : insert all vertices and edges from an input graph, in a random order. Use the command:
@@ -169,6 +191,18 @@ There are three kinds of experiments that can be executed:
 ```
 ./gfe_driver -G /path/to/input/graph.properties -u -l <system_to_evaluate> -w <num_threads> -d output_results.sqlite3
 ```
+Here are some examples:
+
+If you are using a property file to indicate the input graph:
+```
+./gfe_driver -u -G ../../../../Dataset/GFEDataset/graph500-24.properties -l bvgt -w 28 -d extra20230224.sqlite3
+```
+If you are using a plain edge list file (each line of the file contains two integers) as the input graph:
+```
+./gfe_driver -u -G ../../../../Dataset/GFEDataset/yahoo-song.el -l bvgt -w 56 --is_timestamped true -d extra20230224.sqlite3
+```
+
+
 - **Deletions** : insert all vertices and edges from an input graph, in a random order, then delete all of them in random order. 
 Comment line 198~231 in experiment/details/insert_only.cpp, then recompile the gfe-driver and use following command to evaluate deletion performance:
 
@@ -287,4 +321,20 @@ For all combinations of reading ($r in \[1, 2, 4, 8, 16, 32\]) and writing threa
 ./gfe_driver  -u  -R 3 -d results.sqlite3 -l livegraph3_ro -G /path/to/graph500-24.properties -w $w -r $r --blacklist sssp,cdlp,pagerank,wcc,lcc --log /path/to/graph500-24-1.0.graphlog --aging_timeout 2h --mixed_workload true
 ./gfe_driver  -u  -R 3 -d results.sqlite3 -l bvgt -G /path/to/graph500-24.properties -w $w -r $r --blacklist sssp,cdlp,bfs,wcc,lcc --log /path/to/graph500-24-1.0.graphlog --aging_timeout 2h --mixed_workload true --block_size 512
 ./gfe_driver  -u  -R 3 -d results.sqlite3 -l livegraph3_ro -G /path/to/graph500-24.properties -w $w -r $r --blacklist sssp,cdlp,bfs,wcc,lcc --log /path/to/graph500-24-1.0.graphlog --aging_timeout 2h --mixed_workload true
+```
+
+##### A simple example of running insertions using 56 threads with Stinger (Suppore that Stinger has already been built in the build directory):
+```bash
+cd build 
+make clean
+../configure --enable-optimize --enable-mem-analysis --disable-debug --with-stinger=../../../stinger-gfe/stinger/build
+make -j
+./gfe_driver -u -G ../../../../Dataset/GFEDataset/graph500-24.properties -l stinger7-ref -w 56 -d result.sqlite3 >> ExSpruceAllInsertMem0708.txt
+./gfe_driver -u -G ../../../../Dataset/GFEDataset/uniform-24.properties -l stinger7-ref -w 56 -d result.sqlite3 >> ExSpruceAllInsertMem0708.txt
+./gfe_driver -u -G ../../../../Dataset/GFEDataset/yahoo-song.el -l stinger7-ref -w 56 --is_timestamped true -d result.sqlite3 >>ExSpruceAllInsertMem0708.txt
+./gfe_driver -u -G ../../../../Dataset/GFEDataset/yahoo-song.el -l stinger7-ref -w 56 -d result.sqlite3 >> ExSpruceAllInsertMem0708.txt
+./gfe_driver -u -G ../../../../Dataset/GFEDataset/dota-league.properties -l stinger7-ref -w 56 -d result.sqlite3 >> ExSpruceAllInsertMem0708.txt
+./gfe_driver -u -G ../../../../Dataset/Friendster/com-friendster.ungraph.el -l stinger7-ref -w 56 -d result.sqlite3 >> ExSpruceAllInsertMem0708.txt
+./gfe_driver -u -G ../../../../Dataset/Orkut/com-orkut.ungraph.el -l stinger7-ref -w 56 -d result.sqlite3 >> ExSpruceAllInsertMem0708.txt
+./gfe_driver -u -G ../../../../Dataset/LiveJournal/com-lj.ungraph.el -l stinger7-ref -w 56 -d result.sqlite3 >> ExSpruceAllInsertMem0708.txt
 ```
