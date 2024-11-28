@@ -12,7 +12,7 @@ namespace gfe::library {
  *                                                                           *
  *****************************************************************************/
     BVGTDriver::BVGTDriver(bool is_directed) : top_block(new SpruceTransVer::TopBlock),
-                                               m_is_directed(is_directed), vertex_num(317728),
+                                               m_is_directed(is_directed), vertex_num(1),
     edge_num(0){
 //        if (is_directed == true) { throw std::invalid_argument("Graph is directed"); }
 //        else {
@@ -97,8 +97,8 @@ namespace gfe::library {
     bool BVGTDriver::add_edge_v2(gfe::graph::WeightedEdge e) {
         edge_num++;
         // for graph analysis
-//        if (e.m_destination >= vertex_num) vertex_num = e.m_destination + 1;
-//        if (e.m_source >= vertex_num) vertex_num = e.m_source + 1;
+       if (e.m_destination >= vertex_num) vertex_num = e.m_destination + 1;
+       if (e.m_source >= vertex_num) vertex_num = e.m_source + 1;
 
 //       if(!is_directed()){
         SpruceTransVer::InsertEdge((SpruceTransVer::TopBlock*)top_block, SpruceTransVer::WeightedEdge{(uint32_t)e.m_source, (uint32_t)e.m_destination, (float)e.m_weight});
@@ -322,7 +322,7 @@ more consistent performance for undirected graphs.
 
 
         void BVGTDriver::cdlp(uint64_t max_iterations, const char* dump2file) {
-            cdlp_m((SpruceTransVer::TopBlock*)top_block, max_iterations, vertex_num);
+            cdlp_m((SpruceTransVer::TopBlock*)top_block, (uint32_t)max_iterations, (uint32_t)vertex_num);
         }
 
 /*****************************************************************************

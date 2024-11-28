@@ -273,7 +273,7 @@ Comment line 198~231 in experiment/details/insert_only.cpp, then recompile the g
 
 ##### Memory Consumption
 
-Comment line 92~99 in experiment/details/insert_only.cpp, then recompile the gfe-driver and use the following command to evaluate deletion performance. The memory consumption during the loading process will be printed in the console.
+Comment line 95~102 in experiment/insert_only.cpp, then recompile the gfe-driver and use the following command to evaluate deletion performance. The memory consumption during the loading process will be printed in the console.
 
 ```shell
 mkdir build && cd build

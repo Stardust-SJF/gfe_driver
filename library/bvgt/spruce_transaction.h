@@ -10,7 +10,7 @@
 #define DELETE_TYPE 0
 #define UPDATE_TYPE 1
 
-#include "index_algorithms.h"
+#include "header.h"
 
 class SpruceTransVer{
 public:

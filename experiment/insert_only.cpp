@@ -92,14 +92,14 @@ void InsertOnly::execute_round_robin(){
             while( (start = start_chunk_next.fetch_add(m_scheduler_granularity)) < size ){
                 uint64_t end = std::min<uint64_t>(start + m_scheduler_granularity, size);
                 //if case is used to monitor mem, comment if and tempp for testing insertion speed (following 8 lines)
-                if(thread_id==0) {
-                    if (end > tempp) {
-                        int64_t memll = common::get_memory_footprint();
-                        LOG(memll-memllb);
-                        tempp += size / 100;
-//                        LOG(tempp << " " << memll);
-                    }
-                }
+//                 if(thread_id==0) {
+//                     if (end > tempp) {
+//                         int64_t memll = common::get_memory_footprint();
+//                         LOG(memll-memllb);
+//                         tempp += size / 100;
+// //                        LOG(tempp << " " << memll);
+//                     }
+//                 }
                 run_sequential(interface, graph, start, end);
             }
 

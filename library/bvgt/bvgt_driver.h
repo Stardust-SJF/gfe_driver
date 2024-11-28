@@ -9,23 +9,21 @@
 #include <utility>
 #include <vector>
 #include "library/interface.hpp"
-#include "../../../../../index_algorithms.h"
-#include "../../../../../spruce_transaction.h"
-#include "../../../../../graph_algorithms.h"
-#include "../../../../../third_party/gapbs/src/pr_spmv.h"
-#include "../../../../../third_party/gapbs/src/bfs.h"
-#include "../../../../../third_party/gapbs/src/tc.h"
-#include "../../../../../third_party/gapbs/src/sssp.h"
-#include "../../../../../third_party/gapbs/src/cc_sv.h"
+#include "spruce_transaction.h"
+#include "cdlp.h"
+#include "header.h"
+#include "./third_party/gapbs/src/pr_spmv.h"
+#include "./third_party/gapbs/src/bfs.h"
+#include "./third_party/gapbs/src/tc.h"
+#include "./third_party/gapbs/src/sssp.h"
+#include "./third_party/gapbs/src/cc_sv.h"
 
 namespace gfe::library {
 
     class BVGTDriver : public virtual UpdateInterface, public virtual GraphalyticsInterface {
-//    TeseoDriver(const TeseoDriver&) = delete;
-//    TeseoDriver& operator=(const TeseoDriver&) = delete;
 
     protected:
-        void* top_block; // pointer to the teseo library
+        void* top_block; // pointer to the library
         const bool m_is_directed; // whether the underlying graph is directed or undirected
         std::chrono::seconds m_timeout{0}; // the budget to complete each of the algorithms in the Graphalytics suite
         std::atomic<uint32_t> vertex_num;

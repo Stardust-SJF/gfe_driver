@@ -116,7 +116,7 @@ static void run_standalone(int argc, char* argv[]){
 
             LOG("[driver] Number of concurrent threads: " << configuration().num_threads(THREADS_WRITE) );
 
-            if(configuration().measure_lsatency()) ERROR("[driver] InsertOnly, support for latency measurements removed");
+            if(configuration().measure_latency()) ERROR("[driver] InsertOnly, support for latency measurements removed");
 
             InsertOnly experiment { impl_upd, stream, configuration().num_threads(THREADS_WRITE) };
             experiment.set_build_frequency(chrono::milliseconds{ configuration().get_build_frequency() });
