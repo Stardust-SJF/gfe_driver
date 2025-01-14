@@ -27,13 +27,6 @@
 #include <atomic>
 #include <thread>
 #include <random>
-#include <boost/graph/adjacency_matrix.hpp>
-#include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/edge_list.hpp>
-#include <boost/tuple/tuple.hpp>
-#include <boost/thread.hpp>
-#include <boost/thread/shared_mutex.hpp>
-#include <boost/thread/lockable_concepts.hpp>
 #include <tbb/concurrent_vector.h>
 //#include <tbb/compat/thread>
 #include <tbb/tbb_allocator.h> // zero_allocator defined here
